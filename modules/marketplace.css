@@ -1,0 +1,255 @@
+/* ============================================
+   BAUSITE Geo — Marketplace Styles
+   ============================================ */
+
+.mp-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  background: white;
+  border-radius: 14px;
+  padding: 24px 28px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-width: 340px;
+  max-width: 420px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.mp-dialog h3 {
+  font-size: 17px;
+  color: var(--navy);
+  margin-bottom: 12px;
+}
+
+.mp-dialog label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--slate);
+  margin-bottom: 3px;
+  margin-top: 10px;
+}
+
+.mp-dialog input,
+.mp-dialog select,
+.mp-dialog textarea {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.mp-auto-vals {
+  display: flex;
+  gap: 16px;
+  padding: 8px 12px;
+  background: var(--lighter);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.mp-lbl { color: var(--slate); }
+
+.mp-btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.mp-btn-primary {
+  flex: 1;
+  background: var(--orange);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  transition: background 0.15s;
+}
+
+.mp-btn-primary:hover { background: #d4702e; }
+
+.mp-btn-cancel {
+  flex: 0.6;
+  background: var(--light);
+  color: var(--slate);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.mp-btn-small {
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 6px;
+}
+
+.mp-btn-small:hover { background: var(--orange); }
+
+/* ── KV Panel ── */
+.mp-kv-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  background: white;
+  border-radius: 14px;
+  padding: 0;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-width: 400px;
+  max-width: 500px;
+  overflow: hidden;
+}
+
+.mp-kv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--navy);
+  color: white;
+}
+
+.mp-kv-header h3 {
+  font-size: 15px;
+  color: var(--orange);
+  margin: 0;
+}
+
+.mp-close {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.mp-close:hover { color: white; }
+
+.mp-kv-meta {
+  display: flex;
+  gap: 16px;
+  padding: 10px 20px;
+  background: var(--lighter);
+  font-size: 12px;
+  color: var(--slate);
+  border-bottom: 1px solid var(--border);
+}
+
+.mp-kv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  padding: 0 20px;
+}
+
+.mp-kv-table th {
+  text-align: left;
+  padding: 8px 10px 6px;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--slate);
+  border-bottom: 1px solid var(--border);
+}
+
+.mp-kv-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(226,232,240,0.5);
+  color: var(--navy);
+}
+
+.mp-kv-total td {
+  padding-top: 10px;
+  border-top: 2px solid var(--navy);
+  font-size: 14px;
+}
+
+.mp-kv-actions {
+  display: flex;
+  gap: 8px;
+  padding: 14px 20px;
+  background: var(--lighter);
+  border-top: 1px solid var(--border);
+}
+
+/* ── Vergleich Panel ── */
+.mp-vergleich-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-width: 480px;
+  max-width: 580px;
+}
+
+/* ── Anfrage-Karten (Feed) ── */
+.mp-anfrage-card {
+  background: var(--lighter);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mp-anfrage-card:hover {
+  background: #EFF6FF;
+  border-color: var(--blue-light);
+}
+
+.mp-ac-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.mp-ac-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mp-ac-badge.open { background: rgba(34,197,94,0.12); color: #16A34A; }
+.mp-ac-badge.closed { background: rgba(100,116,139,0.12); color: #64748B; }
+
+.mp-ac-meta {
+  font-size: 10px;
+  color: var(--slate);
+  margin-top: 4px;
+}

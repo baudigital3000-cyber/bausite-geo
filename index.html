@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BAUSITE Geo — GIS-Plattform für Bauprofis</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◆</text></svg>">
+  <script src="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="modules/drawing.css">
+  <link rel="stylesheet" href="modules/layers.css">
+  <link rel="stylesheet" href="modules/measure.css">
+  <link rel="stylesheet" href="modules/routing.css">
+  <link rel="stylesheet" href="modules/marketplace.css">
+  <link rel="stylesheet" href="modules/rapport.css">
+  <link rel="stylesheet" href="modules/kubatur.css">
+  <link rel="stylesheet" href="modules/search.css">
+</head>
+<body>
+  <!-- ══════ Rollenauswahl (Login-Screen) ══════ -->
+  <div id="role-screen" class="role-screen">
+    <div class="role-container">
+      <div class="role-logo">
+        <span class="logo-icon" style="font-size:32px;">◆</span>
+        <span class="logo-text" style="font-size:28px;">BAUSITE</span>
+        <span class="logo-geo" style="font-size:28px;">Geo</span>
+      </div>
+      <p class="role-subtitle">Wer sind Sie?</p>
+      <div class="role-grid">
+        <div class="role-card" onclick="selectRole('baufuehrer')">
+          <div class="role-icon">🏗️</div>
+          <div class="role-name">Bauunternehmer</div>
+          <div class="role-desc">Baustellen, Maschinen, Kubatur, Rapporte, Routing</div>
+        </div>
+        <div class="role-card" onclick="selectRole('behoerde')">
+          <div class="role-icon">🏛️</div>
+          <div class="role-name">Behörde / Blaulicht</div>
+          <div class="role-desc">Sperrungen, Umfahrungen, Bewilligungen, Erreichbarkeit</div>
+        </div>
+        <div class="role-card" onclick="selectRole('eigentuemer')">
+          <div class="role-icon">🏠</div>
+          <div class="role-name">Eigentümer</div>
+          <div class="role-desc">Fläche zeichnen, Kostenvoranschlag, Offerten anfragen</div>
+        </div>
+        <div class="role-card" onclick="selectRole('netzbetreiber')">
+          <div class="role-icon">⚡</div>
+          <div class="role-name">Netzbetreiber</div>
+          <div class="role-desc">Leitungskataster, SIA 405, Netzwerk-Analyse</div>
+        </div>
+      </div>
+      <button class="role-skip" onclick="selectRole('alle')">Alle Features anzeigen (Demo)</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-icon">◆</span>
+        <span class="logo-text">BAUSITE</span>
+        <span class="logo-geo">Geo</span>
+      </div>
+      <span class="header-badge" id="role-badge" onclick="changeRole()" style="cursor:pointer;" title="Rolle wechseln">Demo</span>
+    </div>
+    <div class="header-right">
+      <div class="header-stat">
+        <span class="stat-value" id="project-count">0</span>
+        <span class="stat-label">Baustellen</span>
+      </div>
+      <div class="header-stat">
+        <span class="stat-value" id="total-volume">0</span>
+        <span class="stat-label">m³ Aushub</span>
+      </div>
+      <div class="header-stat">
+        <span class="stat-value" id="total-cost">0</span>
+        <span class="stat-label">CHF Budget</span>
+      </div>
+      <div class="header-divider"></div>
+      <div class="header-stat">
+        <span class="stat-value" id="machine-count">0</span>
+        <span class="stat-label">Maschinen aktiv</span>
+      </div>
+      <div class="header-stat">
+        <span id="tracking-status" class="tracking-status"><span class="tracking-dot"></span> Verbinde...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <!-- Layer Controls -->
+      <div class="panel" data-role="alle baufuehrer behoerde eigentuemer netzbetreiber">
+        <div class="panel-header" onclick="togglePanel('layers')">
+          <span>🗺️ Karten</span>
+          <span class="panel-toggle" id="layers-toggle">▾</span>
+        </div>
+        <div class="panel-content" id="layers-content">
+          <label class="layer-toggle">
+            <input type="checkbox" id="layer-luftbild" checked onchange="toggleLayer('luftbild')">
+            <span class="toggle-slider"></span>
+            <span>Luftbild (SWISSIMAGE)</span>
+          </label>
+          <label class="layer-toggle">
+            <input type="checkbox" id="layer-landeskarte" onchange="toggleLayer('landeskarte')">
+            <span class="toggle-slider"></span>
+            <span>Landeskarte 1:25'000</span>
+          </label>
+          <label class="layer-toggle">
+            <input type="checkbox" id="layer-av" onchange="toggleLayer('av')">
+            <span class="toggle-slider"></span>
+            <span>Amtliche Vermessung</span>
+          </label>
+          <label class="layer-toggle">
+            <input type="checkbox" id="layer-baustellen" checked onchange="toggleLayer('baustellen')">
+            <span class="toggle-slider"></span>
+            <span>Baustellen</span>
+          </label>
+          <label class="layer-toggle">
+            <input type="checkbox" id="layer-graben" checked onchange="toggleLayer('graben')">
+            <span class="toggle-slider"></span>
+            <span>Gräben & Leitungen</span>
+          </label>
+          <label class="layer-toggle">
+            <input type="checkbox" id="layer-maschinen" checked onchange="toggleLayer('maschinen')">
+            <span class="toggle-slider"></span>
+            <span>Maschinen</span>
+          </label>
+          <!-- Sperrungen werden über Routing-Modul gesteuert (Toggle-Button) -->
+          <label class="layer-toggle">
+            <input type="checkbox" id="layer-strassennetz" onchange="toggleLayer('strassennetz')">
+            <span class="toggle-slider"></span>
+            <span>Strassennetz (OSM)</span>
+          </label>
+          <!-- Geofences: deaktiviert bis GPS-Tracking-Backend steht (Backlog) -->
+          <!-- <label class="layer-toggle">
+            <input type="checkbox" id="layer-geofences" checked onchange="toggleLayer('geofences')">
+            <span class="toggle-slider"></span>
+            <span>Geofences (Perimeter)</span>
+          </label> -->
+          <label class="layer-toggle">
+            <input type="checkbox" id="layer-logistik" onchange="toggleLayer('logistik')">
+            <span class="toggle-slider"></span>
+            <span>Logistik (Kieswerk/Deponie)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Maschinen-Tracking Panel -->
+      <div class="panel" data-role="alle baufuehrer">
+        <div class="panel-header" onclick="togglePanel('machines')">
+          <span>🚜 Maschinen-Tracking</span>
+          <span class="panel-toggle collapsed" id="machines-toggle">▸</span>
+        </div>
+        <div class="panel-content collapsed" id="machines-content">
+          <label class="layer-toggle" style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border);">
+            <input type="checkbox" id="tracking-toggle" onchange="toggleTracking()">
+            <span class="toggle-slider"></span>
+            <span>Live-Tracking aktiv</span>
+          </label>
+          <div id="machine-stats" class="machine-stats-bar"></div>
+          <div id="machine-list" class="machine-list"></div>
+        </div>
+      </div>
+
+      <!-- Project List -->
+      <div class="panel" data-role="alle baufuehrer behoerde">
+        <div class="panel-header" onclick="togglePanel('projects')">
+          <span>🏗️ Baustellen</span>
+          <span class="panel-toggle collapsed" id="projects-toggle">▸</span>
+        </div>
+        <div class="panel-content collapsed" id="projects-content">
+          <button class="tool-btn" style="width:100%;margin-bottom:8px;background:#E8833A;color:white;font-weight:700;" onclick="startNeueBaustelle()">+ Neue Baustelle</button>
+          <div id="project-list"></div>
+        </div>
+      </div>
+
+      <!-- Kubatur Panel -->
+      <div class="panel" data-role="alle baufuehrer">
+        <div class="panel-header" onclick="togglePanel('kubatur')">
+          <span>📊 Kubatur & Kosten</span>
+          <span class="panel-toggle collapsed" id="kubatur-toggle">▸</span>
+        </div>
+        <div class="panel-content collapsed" id="kubatur-content">
+          <div id="kubatur-summary"></div>
+          <div style="border-top: 2px solid var(--border); margin-top: 10px; padding-top: 10px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; color: var(--orange); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">// Rechner</div>
+            <button class="tool-btn" onclick="KubaturModule.startGrabenRechner()">⛏️ Graben-Kubatur</button>
+            <button class="tool-btn" onclick="KubaturModule.startFlaechenRechner()">⬛ Flächen-Kubatur</button>
+            <button class="tool-btn" onclick="KubaturModule.showMassenliste()">📋 Massenliste / Ausmass</button>
+            <button class="tool-btn" onclick="KubaturModule.showEinheitspreise()">💰 Einheitspreise</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Behörden-Portal -->
+      <div class="panel" data-role="alle behoerde">
+        <div class="panel-header" onclick="togglePanel('behoerden')">
+          <span>🏛️ Behörden-Portal</span>
+          <span class="panel-toggle collapsed" id="behoerden-toggle">▸</span>
+        </div>
+        <div class="panel-content collapsed" id="behoerden-content">
+          <button class="tool-btn" onclick="BehoerdenModule.showDashboard()">📊 Dashboard</button>
+          <button class="tool-btn" onclick="BehoerdenModule.showBewilligungen()">📋 Bewilligungen</button>
+          <button class="tool-btn" onclick="BehoerdenModule.checkErreichbarkeit()">🚑 Erreichbarkeits-Check</button>
+          <button class="tool-btn" onclick="BehoerdenModule.showKritischeInfrastruktur()">🏥 Kritische Infrastruktur</button>
+          <button class="tool-btn" onclick="BehoerdenModule.showKalender()">📅 Baustellen-Kalender</button>
+          <button class="tool-btn" onclick="BehoerdenModule.showUebersicht()">🗺️ Übersichtskarte</button>
+        </div>
+      </div>
+
+      <!-- Eigentümer-Marketplace -->
+      <div class="panel" data-role="alle eigentuemer">
+        <div class="panel-header" onclick="togglePanel('marketplace')">
+          <span>🏠 Eigentümer-Marketplace</span>
+          <span class="panel-toggle collapsed" id="marketplace-toggle">▸</span>
+        </div>
+        <div class="panel-content collapsed" id="marketplace-content">
+          <button class="tool-btn" onclick="MarketplaceModule.startAnfrage()">✏️ Fläche zeichnen + Auto-KV</button>
+          <button class="tool-btn" onclick="MarketplaceModule.showAnfragenAufKarte()">📍 Anfragen auf Karte</button>
+          <div style="border-top:1px solid var(--border);margin:8px 0;padding-top:8px;">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;color:var(--orange);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">// Bauunternehmer</div>
+            <button class="tool-btn" onclick="MarketplaceModule.showAnfragenFeed()">📬 Aufträge in meiner Region</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Routing & Verkehr -->
+      <div class="panel" data-role="alle baufuehrer behoerde">
+        <div class="panel-header" onclick="togglePanel('routing')">
+          <span>🚦 Routing & Verkehr</span>
+          <span class="panel-toggle collapsed" id="routing-toggle">▸</span>
+        </div>
+        <div class="panel-content collapsed" id="routing-content">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; color: var(--orange); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">// Routing</div>
+          <button class="tool-btn" onclick="RoutingModule.startRoute()">🗺️ Route berechnen (A→B)</button>
+          <!-- Strassenbreiten: deaktiviert bis eigene AV-Grundlage vorhanden (OSM width-Tag zu lückenhaft) -->
+          <!-- <button class="tool-btn" id="btn-street-widths" onclick="RoutingModule.showStreetWidths()">📐 Strassenbreiten</button>
+          <div id="street-width-legend" class="width-legend-inline" style="display:none;"></div> -->
+          <div style="border-top: 2px solid var(--border); margin: 8px 0; padding-top: 8px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; color: var(--orange); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">// Sperrungen & Umfahrungen</div>
+            <button class="tool-btn" onclick="RoutingModule.startClosure()">🚧 Sperrung erfassen</button>
+            <button class="tool-btn" id="btn-closures-toggle" onclick="RoutingModule.toggleClosures()">🔴 Sperrungen ein/aus</button>
+            <button class="tool-btn" onclick="RoutingModule.showDetours()">🔵 Umfahrungen anzeigen</button>
+          </div>
+          <div style="border-top: 2px solid var(--border); margin: 8px 0; padding-top: 8px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; color: var(--orange); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">// Materialplatz</div>
+            <button class="tool-btn" onclick="RoutingModule.searchMaterialplatz()">📦 Materialplatz suchen</button>
+          </div>
+          <div style="border-top: 2px solid var(--border); margin: 8px 0; padding-top: 8px;">
+            <button class="tool-btn" onclick="RoutingModule.cleanup()" style="color: var(--slate);">🗑️ Routing zurücksetzen</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tools -->
+      <div class="panel" data-role="alle baufuehrer eigentuemer">
+        <div class="panel-header" onclick="togglePanel('tools')">
+          <span>🛠️ Werkzeuge</span>
+          <span class="panel-toggle collapsed" id="tools-toggle">▸</span>
+        </div>
+        <div class="panel-content collapsed" id="tools-content">
+          <button class="tool-btn" onclick="activateTool('measure')">📏 Distanz messen</button>
+          <button class="tool-btn" onclick="activateTool('area')">📐 Fläche messen</button>
+          <button class="tool-btn" onclick="activateTool('profile')">📈 Höhenprofil</button>
+          <button class="tool-btn" onclick="MeasureModule.startHeight()">⛰️ Punkt-Höhenabfrage</button>
+          <button class="tool-btn" onclick="MeasureModule.startSlope()">📐 Neigung / Gefälle</button>
+          <button class="tool-btn" onclick="MeasureModule.clearMeasurements()">🗑️ Messungen löschen</button>
+          <button class="tool-btn" onclick="zoomToGrenchen()">🎯 Grenchen zentrieren</button>
+          <button class="tool-btn" onclick="exportView()">📄 Ansicht exportieren</button>
+          <div style="border-top: 2px solid var(--border); margin: 8px 0; padding-top: 8px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; color: var(--orange); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">// Zeichnen</div>
+            <button class="tool-btn" onclick="DrawingModule.startPolygon()">📐 Polygon zeichnen</button>
+            <button class="tool-btn" onclick="DrawingModule.startLine()">📏 Linie zeichnen</button>
+            <button class="tool-btn" onclick="DrawingModule.startPoint()">📍 Punkt setzen</button>
+            <button class="tool-btn" onclick="DrawingModule.exportGeoJSON()">💾 GeoJSON Export</button>
+            <button class="tool-btn" onclick="DrawingModule.importGeoJSON()">📂 GeoJSON Import</button>
+            <button class="tool-btn" onclick="DrawingModule.clearAll()">🗑️ Alle Zeichnungen löschen</button>
+          </div>
+          <div style="border-top: 2px solid var(--border); margin: 8px 0; padding-top: 8px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; color: var(--orange); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">// Rapport & Doku</div>
+            <button class="tool-btn" onclick="RapportModule.showRapportForm()">📋 Tagesrapport</button>
+            <button class="tool-btn" onclick="RapportModule.showRapportList()">📑 Rapporte anzeigen</button>
+            <button class="tool-btn" onclick="RapportModule.showPhotoUpload()">📷 Fotodokumentation</button>
+            <button class="tool-btn" onclick="RapportModule.showDashboard()">📊 Dashboard</button>
+            <button class="tool-btn" onclick="RapportModule.showExportMenu()">📤 Daten exportieren</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Map Container -->
+    <div class="map-container">
+      <div id="map"></div>
+
+      <!-- Map Controls -->
+      <div class="map-controls">
+        <button class="map-btn" onclick="switchBasemap('luftbild')" title="Luftbild">🛰️</button>
+        <button class="map-btn" onclick="switchBasemap('karte')" title="Landeskarte">🗺️</button>
+        <button class="map-btn" onclick="switchBasemap('grau')" title="Graukarte">⬜</button>
+      </div>
+
+      <!-- Info Panel (bottom) -->
+      <div class="info-bar" id="info-bar">
+        <span id="coordinates">—</span>
+        <span id="coordinates-ch">—</span>
+        <span id="scale">Massstab: —</span>
+        <span class="info-badge">LV95 / WGS84</span>
+      </div>
+    </div>
+
+    <!-- Detail Panel (right side, shown on selection) -->
+    <aside class="detail-panel" id="detail-panel">
+      <div class="detail-header">
+        <h3 id="detail-title">—</h3>
+        <button class="close-btn" onclick="closeDetail()">✕</button>
+      </div>
+      <div id="detail-content"></div>
+    </aside>
+  </div>
+
+  <!-- Toast Container für Tracking-Alerts -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="modules/drawing.js"></script>
+  <script src="modules/measure.js"></script>
+  <script src="modules/layers.js"></script>
+  <script src="modules/rapport.js"></script>
+  <script src="modules/kubatur.js"></script>
+  <script src="modules/search.js"></script>
+  <script src="modules/routing.js"></script>
+  <script src="modules/behoerden.js"></script>
+  <script src="modules/marketplace.js"></script>
+  <script>
+    // Module initialisieren sobald die Karte bereit ist
+    map.on('load', function() {
+      if (typeof LayersModule !== 'undefined') LayersModule.init(map);
+      if (typeof SearchModule !== 'undefined') SearchModule.init(map);
+    });
+  </script>
+</body>
+</html>

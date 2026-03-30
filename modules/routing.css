@@ -1,0 +1,320 @@
+/* ============================================
+   BAUSITE Geo — Routing Module Styles
+   ============================================ */
+
+/* ── Route Info Box ── */
+.route-info-box {
+  position: absolute;
+  bottom: 40px;
+  right: 16px;
+  z-index: 15;
+  background: rgba(17, 28, 51, 0.92);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: white;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  min-width: 220px;
+  max-width: 300px;
+}
+
+.route-info-box .ri-title {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: var(--orange);
+}
+
+.route-info-box .ri-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.route-info-box .ri-label {
+  color: rgba(255,255,255,0.6);
+}
+
+.route-info-box .ri-value {
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+
+/* ── Detour Comparison Table ── */
+.detour-table-overlay {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  background: rgba(17, 28, 51, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: white;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+  max-width: 500px;
+}
+
+.detour-table-overlay h4 {
+  font-size: 13px;
+  color: var(--orange);
+  margin-bottom: 10px;
+}
+
+.detour-table-overlay table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.detour-table-overlay th {
+  text-align: left;
+  padding: 4px 8px;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.5);
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.detour-table-overlay td {
+  padding: 5px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.detour-table-overlay .route-color {
+  display: inline-block;
+  width: 12px;
+  height: 3px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.detour-table-overlay .close-btn {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.detour-table-overlay .close-btn:hover {
+  color: white;
+}
+
+/* ── Closure Dialog ── */
+.closure-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  background: white;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-width: 320px;
+  max-width: 400px;
+}
+
+.closure-dialog h3 {
+  font-size: 16px;
+  color: var(--navy);
+  margin-bottom: 14px;
+}
+
+.closure-dialog label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--slate);
+  margin-bottom: 4px;
+  margin-top: 10px;
+}
+
+.closure-dialog input,
+.closure-dialog select {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.closure-dialog .btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.closure-dialog .btn-primary {
+  flex: 1;
+  background: var(--orange);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.closure-dialog .btn-primary:hover {
+  background: var(--orange-dark);
+}
+
+.closure-dialog .btn-cancel {
+  flex: 1;
+  background: var(--light);
+  color: var(--slate);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+/* ── Street Width Legend ── */
+.width-legend {
+  position: absolute;
+  bottom: 40px;
+  left: 16px;
+  z-index: 15;
+  background: rgba(17, 28, 51, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: white;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+}
+
+.width-legend .wl-title {
+  font-weight: 700;
+  font-size: 11px;
+  margin-bottom: 6px;
+  color: var(--orange);
+}
+
+.width-legend .wl-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+}
+
+.width-legend .wl-color {
+  width: 20px;
+  height: 4px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* ── Street Width Legend (inline in menu) ── */
+.width-legend-inline {
+  margin: 6px 0 4px 0;
+  padding: 8px 10px;
+  background: rgba(27, 42, 74, 0.06);
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.width-legend-inline .wl-title {
+  font-weight: 700;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--orange);
+  margin-bottom: 5px;
+}
+
+.width-legend-inline .wl-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  font-size: 11px;
+  color: var(--navy);
+}
+
+.width-legend-inline .wl-color {
+  width: 24px;
+  height: 4px;
+  border-radius: 2px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ── Width Hover Popup ── */
+.width-hover-popup .maplibregl-popup-content {
+  padding: 4px 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.width-hover-popup .maplibregl-popup-tip {
+  border-top-color: #fff;
+}
+
+/* ── Vehicle Type Selector (in Banner) ── */
+.vehicle-selector {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 12px;
+}
+
+.vehicle-selector button {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.7);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.vehicle-selector button.active {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: white;
+  font-weight: 600;
+}
+
+.vehicle-selector button:hover:not(.active) {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ── Materialplatz Popup ── */
+.mp-popup-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+  font-size: 11px;
+}
+
+.mp-popup-grid .mp-label {
+  color: var(--slate);
+}
+
+.mp-popup-grid .mp-value {
+  font-weight: 600;
+  color: var(--navy);
+}

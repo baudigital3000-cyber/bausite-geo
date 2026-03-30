@@ -1,0 +1,781 @@
+/* ============================================
+   BAUSITE Geo — Kubatur & Kosten Modul
+   Stylesheet fuer Graben-/Flaechen-Rechner,
+   Massenliste und Einheitspreise
+   Design: Navy (#1B2A4A), Orange (#E8833A)
+   ============================================ */
+
+/* ── Kubatur-Panel (rechte Seite, ueber Detail-Panel) ── */
+.kubatur-panel {
+  position: fixed;
+  top: 56px;                    /* unterhalb Header */
+  right: 0;
+  width: 420px;
+  max-height: calc(100vh - 56px);
+  background: white;
+  border-left: 1px solid var(--border);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.08);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  overflow: hidden;
+}
+
+.kubatur-panel.open {
+  transform: translateX(0);
+}
+
+/* Panel-Header */
+.kubatur-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--navy-deep);
+  color: white;
+  flex-shrink: 0;
+}
+
+.kubatur-panel-header h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kubatur-panel-header h3 .panel-icon {
+  color: var(--orange);
+}
+
+.kubatur-panel-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.kubatur-panel-close:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* Panel-Body scrollbar */
+.kubatur-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.kubatur-panel-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.kubatur-panel-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.kubatur-panel-body::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 2px;
+}
+
+/* ── Abschnitt-Titel ── */
+.kb-section-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+  margin-top: 20px;
+}
+
+.kb-section-title:first-child {
+  margin-top: 0;
+}
+
+/* ── Formularfelder ── */
+.kb-form-group {
+  margin-bottom: 14px;
+}
+
+.kb-form-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+
+.kb-form-group .kb-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.kb-form-group .kb-label-row label {
+  margin-bottom: 0;
+}
+
+.kb-form-group .kb-value-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--orange);
+  background: rgba(232,131,58,0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Slider + Input Kombi */
+.kb-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kb-slider-row input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  outline: none;
+}
+
+.kb-slider-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--orange);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(232,131,58,0.3);
+  transition: transform 0.15s;
+}
+
+.kb-slider-row input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.kb-slider-row input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: var(--orange);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(232,131,58,0.3);
+}
+
+.kb-slider-row input[type="number"] {
+  width: 70px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+  text-align: right;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.kb-slider-row input[type="number"]:focus {
+  border-color: var(--orange);
+}
+
+/* Select / Dropdown */
+.kb-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+  background: white;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%2364748B' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+}
+
+.kb-select:focus {
+  border-color: var(--orange);
+}
+
+/* Standard-Input */
+.kb-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.kb-input:focus {
+  border-color: var(--orange);
+}
+
+/* ── Ergebnis-Zeilen ── */
+.kb-result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.kb-result-row:last-child {
+  border-bottom: none;
+}
+
+.kb-result-label {
+  color: var(--slate);
+}
+
+.kb-result-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: var(--navy);
+  font-size: 12px;
+}
+
+.kb-result-value.highlight {
+  color: var(--orange);
+  font-size: 14px;
+}
+
+/* Total-Zeile */
+.kb-result-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  margin-top: 8px;
+  border-top: 2px solid var(--navy);
+  font-size: 14px;
+}
+
+.kb-result-total .kb-result-label {
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.kb-result-total .kb-result-value {
+  font-weight: 800;
+  color: var(--orange);
+  font-size: 16px;
+}
+
+/* ── Kosten-Aufschluesselung ── */
+.kb-cost-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 11px;
+  border-bottom: 1px solid rgba(226,232,240,0.5);
+}
+
+.kb-cost-line:last-child {
+  border-bottom: none;
+}
+
+.kb-cost-desc {
+  color: var(--slate);
+  flex: 1;
+}
+
+.kb-cost-calc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--slate);
+  opacity: 0.7;
+  margin: 0 10px;
+  white-space: nowrap;
+}
+
+.kb-cost-amount {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: var(--navy);
+  white-space: nowrap;
+}
+
+/* ── SVG Querschnitt Container ── */
+.kb-querschnitt {
+  background: var(--light);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.kb-querschnitt svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Zeichnen-Hinweis ── */
+.kb-draw-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(232,131,58,0.08);
+  border: 1px solid rgba(232,131,58,0.2);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--navy);
+  margin-bottom: 16px;
+}
+
+.kb-draw-hint .hint-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.kb-draw-hint .hint-text {
+  line-height: 1.5;
+}
+
+.kb-draw-hint .hint-text strong {
+  color: var(--orange);
+}
+
+/* Buttons im Panel */
+.kb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.kb-btn-primary {
+  background: var(--orange);
+  color: white;
+}
+
+.kb-btn-primary:hover {
+  background: var(--orange-dark);
+}
+
+.kb-btn-secondary {
+  background: var(--navy);
+  color: white;
+}
+
+.kb-btn-secondary:hover {
+  background: var(--navy-light);
+}
+
+.kb-btn-outline {
+  background: transparent;
+  color: var(--navy);
+  border: 1px solid var(--border);
+}
+
+.kb-btn-outline:hover {
+  border-color: var(--navy);
+  background: var(--light);
+}
+
+.kb-btn-danger {
+  background: rgba(239,68,68,0.1);
+  color: var(--danger);
+}
+
+.kb-btn-danger:hover {
+  background: var(--danger);
+  color: white;
+}
+
+.kb-btn-block {
+  display: flex;
+  width: 100%;
+}
+
+.kb-btn-sm {
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+/* Button-Reihe */
+.kb-btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.kb-btn-row .kb-btn {
+  flex: 1;
+}
+
+/* ── Massenliste Tabelle ── */
+.kb-table-wrap {
+  overflow-x: auto;
+  margin-top: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.kb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.kb-table thead {
+  background: var(--navy-deep);
+  color: rgba(255,255,255,0.8);
+}
+
+.kb-table thead th {
+  padding: 10px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.kb-table thead th:nth-child(n+4) {
+  text-align: right;
+}
+
+.kb-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.kb-table tbody tr:hover {
+  background: rgba(232,131,58,0.04);
+}
+
+.kb-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.kb-table tbody td {
+  padding: 8px 8px;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.kb-table tbody td:nth-child(n+4) {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+
+.kb-table tbody td .kb-pos-nr {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: var(--navy);
+  font-size: 11px;
+}
+
+.kb-table tbody td .kb-pos-desc {
+  font-size: 11px;
+  color: var(--text);
+}
+
+/* Summenzeile */
+.kb-table tfoot tr {
+  background: var(--light);
+  border-top: 2px solid var(--navy);
+}
+
+.kb-table tfoot td {
+  padding: 10px 8px;
+  font-weight: 800;
+  color: var(--navy);
+  font-size: 12px;
+}
+
+.kb-table tfoot td:last-child {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--orange);
+  font-size: 13px;
+  text-align: right;
+}
+
+/* Editierbare Zellen */
+.kb-table td.editable {
+  cursor: pointer;
+  position: relative;
+}
+
+.kb-table td.editable:hover {
+  background: rgba(232,131,58,0.08);
+}
+
+.kb-table td.editable input {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid var(--orange);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--navy);
+  text-align: right;
+  outline: none;
+  background: rgba(232,131,58,0.04);
+}
+
+/* Zeile loeschen Button */
+.kb-row-delete {
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: transparent;
+  color: var(--slate);
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s;
+  opacity: 0;
+}
+
+.kb-table tbody tr:hover .kb-row-delete {
+  opacity: 1;
+}
+
+.kb-row-delete:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* ── Einheitspreise Tabelle ── */
+.kb-ep-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.kb-ep-table thead {
+  background: var(--navy-deep);
+  color: rgba(255,255,255,0.8);
+}
+
+.kb-ep-table thead th {
+  padding: 10px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: left;
+}
+
+.kb-ep-table thead th:last-child {
+  text-align: right;
+}
+
+.kb-ep-table tbody tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.kb-ep-table tbody tr:hover {
+  background: rgba(232,131,58,0.04);
+}
+
+.kb-ep-table tbody td {
+  padding: 8px 8px;
+  vertical-align: middle;
+}
+
+.kb-ep-table tbody td:first-child {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: var(--orange);
+  font-size: 10px;
+}
+
+.kb-ep-table tbody td:last-child {
+  text-align: right;
+}
+
+.kb-ep-table tbody td input {
+  width: 80px;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--navy);
+  text-align: right;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.kb-ep-table tbody td input:focus {
+  border-color: var(--orange);
+}
+
+/* ── Hinweis-Box ── */
+.kb-info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(46,134,171,0.08);
+  border: 1px solid rgba(46,134,171,0.2);
+  border-radius: 8px;
+  font-size: 11px;
+  color: var(--slate);
+  line-height: 1.5;
+  margin-top: 12px;
+}
+
+.kb-info-box .info-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+/* ── Tabs fuer Massenliste/Einheitspreise ── */
+.kb-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.kb-tab {
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--slate);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.15s;
+}
+
+.kb-tab:hover {
+  color: var(--navy);
+}
+
+.kb-tab.active {
+  color: var(--orange);
+  border-bottom-color: var(--orange);
+}
+
+/* ── Graben auf der Karte: Zeichnungs-Layer ── */
+/* MapLibre erledigt die Linien-/Polygon-Darstellung,
+   hier nur Styles fuer Cursor & Tooltip */
+.kb-draw-cursor {
+  cursor: crosshair !important;
+}
+
+/* Tooltip am Cursor */
+.kb-cursor-tooltip {
+  position: fixed;
+  padding: 4px 10px;
+  background: var(--navy-deep);
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 1000;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* ── NPK Badge ── */
+.kb-npk-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(232,131,58,0.1);
+  color: var(--orange);
+  white-space: nowrap;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .kubatur-panel {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* ── Fullscreen Overlay (fuer Massenliste/Einheitspreise) ── */
+.kubatur-panel.fullwidth {
+  width: 620px;
+}
+
+@media (max-width: 900px) {
+  .kubatur-panel.fullwidth {
+    width: 100%;
+  }
+}
+
+/* ── Trennlinie ── */
+.kb-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+/* ── Leer-Zustand ── */
+.kb-empty {
+  text-align: center;
+  padding: 24px 16px;
+  color: var(--slate);
+  font-size: 12px;
+}
+
+.kb-empty .empty-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  display: block;
+}

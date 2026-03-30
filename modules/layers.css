@@ -1,0 +1,467 @@
+/* ============================================
+   BAUSITE Geo — Layer-Modul Stylesheet
+   Geodaten-Layer Manager UI
+   Farben: Navy (#1B2A4A), Orange (#E8833A)
+   Font: Plus Jakarta Sans, Mono: JetBrains Mono
+   ============================================ */
+
+/* ── Panel Container ── */
+.layers-panel {
+  position: absolute;
+  top: 12px;
+  right: 56px; /* rechts neben den Basemap-Buttons */
+  z-index: 15;
+  width: 320px;
+  max-height: calc(100% - 52px); /* Platz für info-bar */
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15), 0 1px 4px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.2s ease;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.layers-panel.collapsed {
+  width: 44px;
+}
+
+.layers-panel.collapsed .layers-panel-body,
+.layers-panel.collapsed .layers-panel-title span:not(.layers-panel-icon),
+.layers-panel.collapsed .layers-panel-badge {
+  display: none;
+}
+
+.layers-panel.collapsed .layers-panel-header {
+  justify-content: center;
+  padding: 12px 8px;
+}
+
+.layers-panel.collapsed .layers-panel-toggle {
+  display: none;
+}
+
+.layers-panel.collapsed .layers-panel-icon {
+  margin: 0;
+}
+
+/* ── Panel Header ── */
+.layers-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #1B2A4A;
+  color: white;
+  flex-shrink: 0;
+}
+
+.layers-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.layers-panel-icon {
+  font-size: 16px;
+}
+
+.layers-panel-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  background: rgba(232, 131, 58, 0.2);
+  color: #E8833A;
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.04em;
+}
+
+.layers-panel-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.layers-panel-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* ── Panel Body (scrollbar) ── */
+.layers-panel-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+}
+
+.layers-panel-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.layers-panel-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.layers-panel-body::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 2px;
+}
+
+/* ── Sections ── */
+.layers-section {
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.layers-section:last-child {
+  border-bottom: none;
+}
+
+.layers-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 4px;
+}
+
+.layers-section-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  color: #E8833A;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Presets ── */
+.layers-presets {
+  display: flex;
+  gap: 6px;
+  padding: 6px 14px 12px;
+  flex-wrap: wrap;
+}
+
+.layers-preset-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  background: #F5F7FA;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1B2A4A;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.layers-preset-btn:hover {
+  border-color: #E8833A;
+  background: rgba(232, 131, 58, 0.06);
+  color: #E8833A;
+}
+
+.layers-preset-btn.active {
+  border-color: #E8833A;
+  background: #E8833A;
+  color: white;
+}
+
+.layers-preset-btn .preset-icon {
+  font-size: 13px;
+}
+
+.layers-preset-btn .preset-name {
+  font-size: 11px;
+}
+
+/* ── Global Opacity Slider ── */
+.layers-global-slider {
+  padding: 0 14px 12px;
+}
+
+/* ── Kategorie-Header ── */
+.layers-category-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+
+.layers-category-header:hover {
+  background: #F5F7FA;
+}
+
+.layers-category-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.layers-category-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1B2A4A;
+  flex: 1;
+}
+
+.layers-category-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  color: #64748B;
+  background: #F1F5F9;
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+.layers-category-chevron {
+  font-size: 10px;
+  color: #94A3B8;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+/* ── Kategorie-Content (klappbar) ── */
+.layers-category-content {
+  padding: 0 8px 8px;
+}
+
+.layers-category-content.collapsed {
+  display: none;
+}
+
+/* ── Layer-Item ── */
+.layers-item {
+  background: #FAFBFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  transition: all 0.15s;
+}
+
+.layers-item:last-child {
+  margin-bottom: 0;
+}
+
+.layers-item:hover {
+  border-color: #CBD5E1;
+  background: white;
+}
+
+.layers-item.active {
+  border-color: rgba(232, 131, 58, 0.4);
+  background: rgba(232, 131, 58, 0.03);
+}
+
+.layers-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Custom Toggle ── */
+.layers-item-toggle {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.layers-item-toggle input[type="checkbox"] {
+  display: none;
+}
+
+.layers-toggle-track {
+  width: 28px;
+  height: 16px;
+  background: #CBD5E1;
+  border-radius: 8px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.layers-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.layers-item-toggle input:checked + .layers-toggle-track {
+  background: #E8833A;
+}
+
+.layers-item-toggle input:checked + .layers-toggle-track .layers-toggle-thumb {
+  transform: translateX(12px);
+}
+
+/* ── Layer Info ── */
+.layers-item-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+
+.layers-item-icon {
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.layers-item-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #1B2A4A;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Info/Doc Link ── */
+.layers-item-doc {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #94A3B8;
+  text-decoration: none;
+  transition: all 0.15s;
+  background: transparent;
+}
+
+.layers-item-doc:hover {
+  color: #2E86AB;
+  background: rgba(46, 134, 171, 0.1);
+}
+
+/* ── Layer Description ── */
+.layers-item-desc {
+  font-size: 10px;
+  color: #64748B;
+  line-height: 1.4;
+  padding: 4px 0 2px 36px; /* eingerückt unter dem Toggle */
+}
+
+/* ── Layer Opacity Slider ── */
+.layers-item-opacity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0 2px 36px;
+}
+
+/* ── Opacity Value Labels ── */
+.layers-opacity-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  color: #64748B;
+  min-width: 32px;
+  text-align: right;
+}
+
+/* ── Custom Range Slider ── */
+.layers-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: #E2E8F0;
+  outline: none;
+  cursor: pointer;
+}
+
+.layers-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #E8833A;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(232, 131, 58, 0.35);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.layers-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(232, 131, 58, 0.5);
+}
+
+.layers-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #E8833A;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 4px rgba(232, 131, 58, 0.35);
+}
+
+.layers-slider-sm {
+  height: 3px;
+}
+
+.layers-slider-sm::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+}
+
+.layers-slider-sm::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .layers-panel {
+    width: 280px;
+    right: 48px;
+    max-height: calc(100% - 48px);
+  }
+
+  .layers-panel.collapsed {
+    width: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .layers-panel {
+    width: 260px;
+    right: 8px;
+    top: 8px;
+  }
+}
