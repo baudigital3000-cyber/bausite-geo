@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BAUSITE Brain - Normen-Assistent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Animation Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tsparticles-slim@2.12.0/tsparticles.slim.bundle.min.js"></script>
+<style>
+:root {
+  --navy: #1B2A4A;
+  --navy-light: #263d66;
+  --navy-dark: #111d33;
+  --orange: #E67E22;
+  --orange-light: #F39C12;
+  --orange-glow: rgba(230, 126, 34, 0.15);
+  --blue-water: #3498DB;
+  --red-strom: #E74C3C;
+  --yellow-gas: #F1C40F;
+  --orange-bau: #E67E22;
+  --green-safe: #2ECC71;
+  --bg: #0a0e1a;
+  --bg2: #0f1525;
+  --bg3: #162035;
+  --bg4: #1c2844;
+  --border: #1e2d4a;
+  --border2: #2a3d5e;
+  --text: #e4e8f0;
+  --text2: #8899bb;
+  --text3: #556688;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 260px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+.sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo {
+  height: 32px;
+  margin-bottom: 14px;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+.new-chat-btn {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(135deg, var(--orange), var(--orange-light));
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.new-chat-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(230,126,34,0.35); }
+.new-chat-btn:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(230,126,34,0.2); }
+
+.history-list { flex: 1; overflow-y: auto; padding: 8px; }
+
+.history-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+.history-item:hover { background: var(--bg3); border-left-color: var(--orange); }
+.history-item.active { background: var(--bg3); border-left-color: var(--orange); color: var(--text); }
+.history-item .date { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+/* ── Main ── */
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+/* ── Top Bar ── */
+.topbar {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg2);
+}
+
+.menu-btn {
+  display: none;
+  background: none; border: none; color: var(--text2);
+  font-size: 22px; cursor: pointer; padding: 4px;
+}
+
+/* Role selector — collapsible, only active visible */
+.role-selector {
+  position: relative;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.role-selector .role-btn {
+  position: relative;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+  color: var(--text3);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Inactive buttons hidden by default */
+.role-selector .role-btn:not(.active) {
+  max-width: 0;
+  padding: 10px 0;
+  border-color: transparent;
+  opacity: 0;
+  pointer-events: none;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Show all on hover/focus of selector */
+.role-selector:hover .role-btn:not(.active),
+.role-selector.expanded .role-btn:not(.active) {
+  max-width: 200px;
+  padding: 10px 16px;
+  border-color: var(--border);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Expand indicator on active btn */
+.role-selector .role-btn.active::after {
+  content: '';
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid rgba(255,255,255,0.6);
+  transition: transform 0.3s ease;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+.role-selector:hover .role-btn.active::after,
+.role-selector.expanded .role-btn.active::after {
+  transform: rotate(180deg);
+}
+
+.role-btn .role-icon { width: 20px; height: 20px; flex-shrink: 0; }
+.role-btn .role-icon svg { width: 100%; height: 100%; }
+
+.role-btn:hover {
+  border-color: rgba(230, 126, 34, 0.4);
+  color: var(--text);
+  background: linear-gradient(135deg, var(--bg3) 0%, var(--bg4) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(230, 126, 34, 0.1);
+}
+
+.role-btn.active {
+  background: linear-gradient(135deg, var(--orange), var(--orange-light));
+  border-color: var(--orange);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(230, 126, 34, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Active glow pulse */
+.role-btn.active::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--orange), var(--orange-light));
+  opacity: 0;
+  z-index: -1;
+  animation: activeGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes activeGlow {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: 0.25; transform: scale(1.03); }
+}
+
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.status-dot { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.status-text { font-size: 11px; color: var(--text3); }
+
+/* ── Filter Bar ── */
+.filterbar {
+  padding: 10px 20px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  scrollbar-width: none;
+}
+.filterbar::-webkit-scrollbar { display: none; }
+
+.filter-chip {
+  position: relative;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(15, 21, 37, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text2);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.filter-chip::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--orange);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.filter-chip:hover {
+  border-color: rgba(255,255,255,0.15);
+  color: var(--text);
+  background: rgba(22, 32, 53, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.filter-chip:hover::after {
+  width: 70%;
+}
+
+.filter-chip.active {
+  border-color: rgba(230, 126, 34, 0.3);
+  background: rgba(22, 32, 53, 0.85);
+  color: var(--text);
+  box-shadow: 0 4px 16px rgba(230, 126, 34, 0.1), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.filter-chip.active::after {
+  width: 80%;
+  background: linear-gradient(90deg, transparent, var(--orange), var(--orange-light), transparent);
+}
+
+.filter-chip .cdot { display: none; }
+
+.filter-chip .med-icon {
+  flex-shrink: 0;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  line-height: 0;
+}
+
+.filter-chip:hover .med-icon {
+  transform: scale(1.1) translateX(1px);
+  filter: brightness(1.15);
+}
+
+.filter-chip.active .med-icon {
+  filter: brightness(1.1) drop-shadow(0 0 4px rgba(230,126,34,0.3));
+}
+
+/* ── Chat Area ── */
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  scroll-behavior: smooth;
+}
+
+/* ── Welcome ── */
+.welcome {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+/* Typed.js cursor */
+.typed-cursor { color: var(--orange); font-weight: 300; font-size: 14px; animation: blink 0.8s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.brain-orb {
+  width: 88px; height: 88px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(230, 126, 34, 0.15), 0 0 80px rgba(230, 126, 34, 0.05);
+  animation: orbFloat 3s ease-in-out infinite;
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.brain-orb::before {
+  content: '';
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  background: conic-gradient(from 0deg, transparent, var(--orange), transparent, var(--orange), transparent);
+  animation: orbSpin 4s linear infinite;
+  opacity: 0.3;
+}
+
+.brain-orb::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, var(--orange), transparent, var(--orange-light));
+  opacity: 0;
+  animation: orbPulseGlow 3s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes orbPulseGlow {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.05); }
+}
+
+@keyframes orbSpin { to { transform: rotate(360deg); } }
+
+.brain-orb img {
+  width: 52px;
+  position: relative;
+  z-index: 1;
+  filter: brightness(0) invert(1);
+}
+
+.brain-orb .brain-emoji {
+  font-size: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.welcome h2 {
+  font-size: 24px; font-weight: 700; margin-bottom: 6px; color: white;
+  background: linear-gradient(135deg, #ffffff 0%, var(--orange-light) 50%, #ffffff 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmerText 4s ease-in-out infinite;
+}
+@keyframes shimmerText {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+.welcome .sub { font-size: 14px; color: var(--text2); margin-bottom: 8px; min-height: 22px; }
+.welcome .stats {
+  font-size: 12px; color: var(--text3); margin-bottom: 32px;
+  display: flex; gap: 16px;
+}
+.welcome .stats span { display: flex; align-items: center; gap: 4px; }
+.welcome .stats .sdot { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+
+.suggestions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 680px; }
+
+.suggest-btn {
+  position: relative;
+  padding: 13px 20px 13px 36px;
+  background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+  border: 1.5px solid rgba(230, 126, 34, 0.15);
+  border-radius: 10px;
+  color: var(--text2);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  text-align: left;
+  line-height: 1.4;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(230, 126, 34, 0.04), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+/* Tech icon indicator */
+.suggest-btn::before {
+  content: '>';
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--orange);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+/* Scan line effect */
+.suggest-btn::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(230, 126, 34, 0.6), transparent);
+  box-shadow: 0 0 8px rgba(230, 126, 34, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  animation: scanDown 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes scanDown {
+  0% { top: -10%; opacity: 0; }
+  30% { opacity: 1; }
+  100% { top: 110%; opacity: 0; }
+}
+
+/* Bottom accent line */
+.suggest-btn .btn-accent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--orange), var(--orange-light), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.suggest-btn:hover {
+  border-color: rgba(230, 126, 34, 0.5);
+  color: var(--text);
+  background: linear-gradient(135deg, var(--bg3) 0%, var(--bg4) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(230, 126, 34, 0.15), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 20px rgba(230, 126, 34, 0.03);
+  text-shadow: 0 0 8px rgba(230, 126, 34, 0.15);
+}
+
+.suggest-btn:hover::before {
+  opacity: 1;
+  color: var(--orange-light);
+  text-shadow: 0 0 6px rgba(230, 126, 34, 0.5);
+}
+
+.suggest-btn:hover::after {
+  opacity: 1;
+}
+
+.suggest-btn:hover .btn-accent {
+  opacity: 1;
+}
+
+.suggest-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 0 10px rgba(230, 126, 34, 0.1);
+}
+
+/* ── Messages ── */
+.msg { max-width: 80%; animation: msgIn 0.35s ease; }
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.msg-user { align-self: flex-end; }
+.msg-user .bubble {
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  color: white;
+  padding: 12px 18px;
+  border-radius: 18px 18px 4px 18px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.msg-bot { align-self: flex-start; }
+.msg-bot .bubble {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 18px 22px;
+  border-radius: 18px 18px 18px 4px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.msg-bot .bubble h1,.msg-bot .bubble h2,.msg-bot .bubble h3 {
+  color: var(--orange-light); margin: 14px 0 6px; font-size: 15px; font-weight: 600;
+}
+.msg-bot .bubble h1:first-child,.msg-bot .bubble h2:first-child,.msg-bot .bubble h3:first-child { margin-top: 0; }
+.msg-bot .bubble strong { color: #f0dcc0; }
+.msg-bot .bubble code { background: var(--bg3); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: var(--orange-light); }
+.msg-bot .bubble ul,.msg-bot .bubble ol { margin: 6px 0 6px 18px; }
+.msg-bot .bubble li { margin: 4px 0; }
+.msg-bot .bubble table { border-collapse: collapse; margin: 10px 0; width: 100%; font-size: 13px; }
+.msg-bot .bubble th,.msg-bot .bubble td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; }
+.msg-bot .bubble th { background: var(--bg3); font-weight: 600; color: var(--orange-light); }
+
+/* Counter-question style */
+.msg-bot.counter-q .bubble {
+  border-color: var(--orange);
+  background: var(--orange-glow);
+  border-left: 3px solid var(--orange);
+}
+
+.msg-bot .bot-label {
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.msg-bot .bot-label .label-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--orange);
+}
+
+/* Sources */
+.sources {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+}
+
+.sources-label { font-size: 11px; color: var(--text3); margin-right: 4px; }
+
+.source-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--text2);
+  transition: all 0.2s;
+}
+.source-tag:hover { border-color: var(--border2); background: var(--bg4); }
+.source-tag .cat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* Followups */
+.followups { margin-top: 14px; display: flex; flex-direction: column; gap: 5px; }
+.followups-label { font-size: 11px; color: var(--text3); margin-bottom: 2px; }
+
+.followup-btn {
+  padding: 9px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text2);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: inherit;
+  text-align: left;
+}
+.followup-btn:hover {
+  border-color: var(--orange);
+  color: var(--orange-light);
+  background: var(--orange-glow);
+  transform: translateX(4px);
+}
+
+/* Actions */
+.msg-actions { margin-top: 6px; display: flex; gap: 12px; }
+.action-btn {
+  background: none; border: none;
+  color: var(--text3); font-size: 11px;
+  cursor: pointer; padding: 2px 0;
+  transition: color 0.2s;
+  font-family: inherit;
+  display: flex; align-items: center; gap: 3px;
+}
+.action-btn:hover { color: var(--orange); }
+
+/* Typing */
+.typing { align-self: flex-start; display: none; animation: msgIn 0.3s ease; }
+.typing .bubble {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 16px 22px;
+  border-radius: 18px 18px 18px 4px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.typing .tdot {
+  width: 8px; height: 8px;
+  background: var(--orange);
+  border-radius: 50%;
+  animation: bounce 1.4s infinite;
+}
+.typing .tdot:nth-child(2) { animation-delay: 0.2s; }
+.typing .tdot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-8px)} }
+
+.typing-text { font-size: 12px; color: var(--text3); margin-left: 8px; }
+
+/* ── Input ── */
+.input-area {
+  padding: 14px 20px;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.input-area textarea {
+  flex: 1;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  max-height: 120px;
+  min-height: 46px;
+  line-height: 1.4;
+  transition: border-color 0.2s;
+}
+.input-area textarea:focus { border-color: var(--orange); box-shadow: 0 0 0 2px var(--orange-glow); }
+.input-area textarea::placeholder { color: var(--text3); }
+
+.send-btn {
+  width: 46px; height: 46px;
+  background: linear-gradient(135deg, var(--orange), var(--orange-light));
+  border: none;
+  border-radius: 14px;
+  color: white;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(230,126,34,0.2);
+}
+.send-btn:hover { transform: scale(1.08); box-shadow: 0 4px 24px rgba(230,126,34,0.4); }
+.send-btn:active { transform: scale(0.92); }
+.send-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+.send-btn.pulse { animation: sendPulse 0.4s ease; }
+@keyframes sendPulse {
+  0% { transform: scale(1); }
+  30% { transform: scale(0.85); }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+.send-btn svg { width: 20px; height: 20px; }
+
+.mic-btn {
+  width: 46px; height: 46px;
+  background: linear-gradient(135deg, var(--bg3), var(--bg4));
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+.mic-btn:hover { border-color: var(--orange); color: var(--orange); }
+.mic-btn.recording {
+  background: linear-gradient(135deg, rgba(231,76,60,0.2), rgba(231,76,60,0.3));
+  border-color: #e74c3c;
+  color: #e74c3c;
+  animation: micPulse 1s ease-in-out infinite;
+}
+@keyframes micPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(231,76,60,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(231,76,60,0); }
+}
+.mic-btn svg { width: 20px; height: 20px; }
+.voice-status {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #e74c3c;
+  white-space: nowrap;
+  background: var(--bg2);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(231,76,60,0.3);
+  display: none;
+}
+.mic-btn.recording .voice-status { display: block; }
+
+.footer {
+  padding: 6px 20px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--text3);
+  background: var(--bg2);
+}
+
+/* Particles */
+#particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.main { position: relative; z-index: 1; }
+.sidebar { position: relative; z-index: 2; }
+
+/* Topbar animated border */
+.topbar {
+  position: relative;
+}
+.topbar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--orange), var(--orange-light), var(--orange), transparent);
+  background-size: 200% 100%;
+  animation: gradientSlide 4s ease infinite;
+  opacity: 0.5;
+}
+@keyframes gradientSlide {
+  0% { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* History items slide in */
+.history-item {
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: slideInLeft 0.3s ease forwards;
+}
+@keyframes slideInLeft {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Overlay */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9; }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .overlay.open { display: block; }
+  .menu-btn { display: block; }
+  .msg { max-width: 92%; }
+  .role-btn { padding: 8px 12px; font-size: 12px; }
+  .role-selector { gap: 4px; }
+  .role-btn .role-icon { width: 16px; height: 16px; }
+  .welcome h2 { font-size: 20px; }
+  .welcome .stats { flex-wrap: wrap; justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- Shared SVG gradient definitions for metallic pipes -->
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+<defs>
+  <!-- Shadow filter -->
+  <filter id="pipeShadow" x="-30%" y="-30%" width="160%" height="180%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+    <feOffset dx="0.5" dy="1.5" result="s"/>
+    <feComponentTransfer><feFuncA type="linear" slope="0.3"/></feComponentTransfer>
+    <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <!-- BLUE (Water) -->
+  <linearGradient id="pBody-w" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#e8f4ff"/><stop offset="18%" stop-color="#93c5fd"/>
+    <stop offset="42%" stop-color="#3b82f6"/><stop offset="68%" stop-color="#1d4ed8"/>
+    <stop offset="88%" stop-color="#1e3a5f"/><stop offset="100%" stop-color="#0c1929"/>
+  </linearGradient>
+  <radialGradient id="pHole-w" cx="45%" cy="35%"><stop offset="0%" stop-color="#2563eb" stop-opacity="0.6"/><stop offset="100%" stop-color="#0a1628"/></radialGradient>
+  <linearGradient id="pRim-w" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#bfdbfe"/><stop offset="50%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1e3a5f"/></linearGradient>
+  <!-- RED (Strom) -->
+  <linearGradient id="pBody-s" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#fecaca"/><stop offset="18%" stop-color="#f87171"/>
+    <stop offset="42%" stop-color="#ef4444"/><stop offset="68%" stop-color="#b91c1c"/>
+    <stop offset="88%" stop-color="#5c1616"/><stop offset="100%" stop-color="#1c0606"/>
+  </linearGradient>
+  <radialGradient id="pHole-s" cx="45%" cy="35%"><stop offset="0%" stop-color="#dc2626" stop-opacity="0.6"/><stop offset="100%" stop-color="#1a0505"/></radialGradient>
+  <linearGradient id="pRim-s" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fca5a5"/><stop offset="50%" stop-color="#ef4444"/><stop offset="100%" stop-color="#5c1616"/></linearGradient>
+  <!-- YELLOW (Gas) -->
+  <linearGradient id="pBody-g" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#fef9c3"/><stop offset="18%" stop-color="#fde047"/>
+    <stop offset="42%" stop-color="#eab308"/><stop offset="68%" stop-color="#a16207"/>
+    <stop offset="88%" stop-color="#5c3a08"/><stop offset="100%" stop-color="#1c1200"/>
+  </linearGradient>
+  <radialGradient id="pHole-g" cx="45%" cy="35%"><stop offset="0%" stop-color="#ca8a04" stop-opacity="0.6"/><stop offset="100%" stop-color="#1a1000"/></radialGradient>
+  <linearGradient id="pRim-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fef08a"/><stop offset="50%" stop-color="#eab308"/><stop offset="100%" stop-color="#5c3a08"/></linearGradient>
+  <!-- ORANGE (Bau) -->
+  <linearGradient id="pBody-b" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#ffedd5"/><stop offset="18%" stop-color="#fdba74"/>
+    <stop offset="42%" stop-color="#f97316"/><stop offset="68%" stop-color="#c2410c"/>
+    <stop offset="88%" stop-color="#6b2308"/><stop offset="100%" stop-color="#1c0a02"/>
+  </linearGradient>
+  <radialGradient id="pHole-b" cx="45%" cy="35%"><stop offset="0%" stop-color="#ea580c" stop-opacity="0.6"/><stop offset="100%" stop-color="#1a0802"/></radialGradient>
+  <linearGradient id="pRim-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fed7aa"/><stop offset="50%" stop-color="#f97316"/><stop offset="100%" stop-color="#6b2308"/></linearGradient>
+  <!-- GREEN (Sicherheit) -->
+  <linearGradient id="pBody-si" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#dcfce7"/><stop offset="18%" stop-color="#86efac"/>
+    <stop offset="42%" stop-color="#22c55e"/><stop offset="68%" stop-color="#15803d"/>
+    <stop offset="88%" stop-color="#14532d"/><stop offset="100%" stop-color="#052e16"/>
+  </linearGradient>
+  <radialGradient id="pHole-si" cx="45%" cy="35%"><stop offset="0%" stop-color="#16a34a" stop-opacity="0.6"/><stop offset="100%" stop-color="#052e16"/></radialGradient>
+  <linearGradient id="pRim-si" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#bbf7d0"/><stop offset="50%" stop-color="#22c55e"/><stop offset="100%" stop-color="#14532d"/></linearGradient>
+  <!-- SILVER (Alle) -->
+  <linearGradient id="pBody-a" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#f8fafc"/><stop offset="18%" stop-color="#cbd5e1"/>
+    <stop offset="42%" stop-color="#94a3b8"/><stop offset="68%" stop-color="#64748b"/>
+    <stop offset="88%" stop-color="#334155"/><stop offset="100%" stop-color="#0f172a"/>
+  </linearGradient>
+  <radialGradient id="pHole-a" cx="45%" cy="35%"><stop offset="0%" stop-color="#64748b" stop-opacity="0.6"/><stop offset="100%" stop-color="#0f172a"/></radialGradient>
+  <linearGradient id="pRim-a" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="50%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#334155"/></linearGradient>
+</defs>
+</svg>
+
+<div id="particles"></div>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <img src="bausite-logo.png" alt="BAUSITE" class="sidebar-logo">
+    <button class="new-chat-btn" onclick="newChat()">+ Neues Gespraech</button>
+  </div>
+  <div class="history-list" id="historyList"></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <button class="menu-btn" onclick="toggleSidebar()">&#9776;</button>
+    <a href="index.html" class="back-link" title="Zurück zu BAUSITE Geo" style="display:flex;align-items:center;gap:4px;color:var(--text3);text-decoration:none;font-size:12px;margin-right:8px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);transition:all 0.2s;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
+      Geo
+    </a>
+    <div class="role-selector" id="roleSelector">
+      <button class="role-btn active" data-role="polier" onclick="setRole('polier',this)">
+        <span class="role-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h20"/><path d="M5 18v-4a7 7 0 0 1 14 0v4"/><path d="M7 10V8a5 5 0 0 1 10 0v2"/><circle cx="12" cy="5" r="1.5" fill="currentColor"/></svg></span>
+        Polier
+      </button>
+      <button class="role-btn" data-role="bauleiter" onclick="setRole('bauleiter',this)">
+        <span class="role-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 11h6"/><path d="M8 15h4"/><path d="M17 15l2 2-2 2"/></svg></span>
+        Bauleiter
+      </button>
+      <button class="role-btn" data-role="planer" onclick="setRole('planer',this)">
+        <span class="role-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 21 3 3 21 3"/><path d="M3 17l6-6 4 4 8-8"/><circle cx="21" cy="7" r="1.5" fill="currentColor"/></svg></span>
+        Planer
+      </button>
+      <button class="role-btn" data-role="behoerde" onclick="setRole('behoerde',this)">
+        <span class="role-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/><path d="M9 10h1"/><path d="M14 10h1"/><path d="M9 14h1"/><path d="M14 14h1"/></svg></span>
+        Behoerde
+      </button>
+      <button class="role-btn" data-role="lehrling" onclick="setRole('lehrling',this)">
+        <span class="role-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10l-10-6L2 10l10 6z"/><path d="M6 12v5c0 2 3 4 6 4s6-2 6-4v-5"/><path d="M22 10v6"/></svg></span>
+        Lehrling
+      </button>
+    </div>
+    <div class="topbar-right">
+      <div class="status-dot"></div>
+      <span class="status-text">485 Dokumente</span>
+    </div>
+  </div>
+
+  <div class="filterbar">
+    <button class="filter-chip active" data-cat="alle" onclick="setCat('alle',this)">
+      <span class="med-icon"><svg viewBox="0 0 36 28" width="30" height="22">
+        <g filter="url(#pipeShadow)">
+          <rect x="2" y="3" width="28" height="8" rx="4" fill="url(#pBody-a)"/>
+          <ellipse cx="30" cy="7" rx="3" ry="4" fill="url(#pRim-a)"/>
+          <ellipse cx="30" cy="7" rx="1.8" ry="2.5" fill="url(#pHole-a)"/>
+          <rect x="2" y="3" width="28" height="2.5" rx="4" fill="white" opacity="0.18"/>
+          <rect x="14" y="14" width="18" height="8" rx="4" fill="url(#pBody-a)" opacity="0.5"/>
+          <ellipse cx="32" cy="18" rx="2.5" ry="3.2" fill="url(#pRim-a)" opacity="0.5"/>
+        </g>
+      </svg></span>
+      Alle Medien
+    </button>
+    <button class="filter-chip" data-cat="wasser" onclick="setCat('wasser',this)">
+      <span class="med-icon"><svg viewBox="0 0 36 20" width="32" height="18">
+        <g filter="url(#pipeShadow)">
+          <rect x="1" y="2" width="30" height="10" rx="5" fill="url(#pBody-w)"/>
+          <ellipse cx="31" cy="7" rx="3.5" ry="5" fill="url(#pRim-w)"/>
+          <ellipse cx="31" cy="7" rx="2.2" ry="3.2" fill="url(#pHole-w)"/>
+          <rect x="1" y="2" width="30" height="3" rx="5" fill="white" opacity="0.22"/>
+          <line x1="5" y1="4" x2="26" y2="4" stroke="white" stroke-width="0.6" opacity="0.35"/>
+          <ellipse cx="10" cy="12" rx="1" ry="1.5" fill="#3b82f6" opacity="0.15">
+            <animate attributeName="cy" values="12;14;12" dur="2s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="18" cy="13" rx="0.8" ry="1.2" fill="#3b82f6" opacity="0.12">
+            <animate attributeName="cy" values="13;15;13" dur="2.5s" repeatCount="indefinite"/>
+          </ellipse>
+        </g>
+      </svg></span>
+      Wasser
+    </button>
+    <button class="filter-chip" data-cat="strom" onclick="setCat('strom',this)">
+      <span class="med-icon"><svg viewBox="0 0 36 20" width="32" height="18">
+        <g filter="url(#pipeShadow)">
+          <rect x="1" y="2" width="30" height="10" rx="5" fill="url(#pBody-s)"/>
+          <ellipse cx="31" cy="7" rx="3.5" ry="5" fill="url(#pRim-s)"/>
+          <ellipse cx="31" cy="7" rx="2.2" ry="3.2" fill="url(#pHole-s)"/>
+          <rect x="1" y="2" width="30" height="3" rx="5" fill="white" opacity="0.22"/>
+          <line x1="5" y1="4" x2="26" y2="4" stroke="white" stroke-width="0.6" opacity="0.35"/>
+          <path d="M16 5l-1.5 3h3L16 11" stroke="#fca5a5" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.6">
+            <animate attributeName="opacity" values="0.6;1;0.6" dur="1.2s" repeatCount="indefinite"/>
+          </path>
+        </g>
+      </svg></span>
+      Strom
+    </button>
+    <button class="filter-chip" data-cat="gas" onclick="setCat('gas',this)">
+      <span class="med-icon"><svg viewBox="0 0 36 20" width="32" height="18">
+        <g filter="url(#pipeShadow)">
+          <rect x="1" y="2" width="30" height="10" rx="5" fill="url(#pBody-g)"/>
+          <ellipse cx="31" cy="7" rx="3.5" ry="5" fill="url(#pRim-g)"/>
+          <ellipse cx="31" cy="7" rx="2.2" ry="3.2" fill="url(#pHole-g)"/>
+          <rect x="1" y="2" width="30" height="3" rx="5" fill="white" opacity="0.25"/>
+          <line x1="5" y1="4" x2="26" y2="4" stroke="white" stroke-width="0.6" opacity="0.4"/>
+          <path d="M14 6c0-2 2-3 2-1s2 1 2-1" stroke="#fef08a" stroke-width="0.8" fill="none" opacity="0.5">
+            <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite"/>
+          </path>
+        </g>
+      </svg></span>
+      Gas
+    </button>
+    <button class="filter-chip" data-cat="bau" onclick="setCat('bau',this)">
+      <span class="med-icon"><svg viewBox="0 0 36 20" width="32" height="18">
+        <g filter="url(#pipeShadow)">
+          <rect x="1" y="2" width="30" height="10" rx="5" fill="url(#pBody-b)"/>
+          <ellipse cx="31" cy="7" rx="3.5" ry="5" fill="url(#pRim-b)"/>
+          <ellipse cx="31" cy="7" rx="2.2" ry="3.2" fill="url(#pHole-b)"/>
+          <rect x="1" y="2" width="30" height="3" rx="5" fill="white" opacity="0.22"/>
+          <line x1="5" y1="4" x2="26" y2="4" stroke="white" stroke-width="0.6" opacity="0.35"/>
+          <line x1="8" y1="2" x2="8" y2="12" stroke="#fed7aa" stroke-width="0.5" opacity="0.2"/>
+          <line x1="16" y1="2" x2="16" y2="12" stroke="#fed7aa" stroke-width="0.5" opacity="0.2"/>
+          <line x1="24" y1="2" x2="24" y2="12" stroke="#fed7aa" stroke-width="0.5" opacity="0.2"/>
+        </g>
+      </svg></span>
+      Bau / Tiefbau
+    </button>
+    <button class="filter-chip" data-cat="sicherheit" onclick="setCat('sicherheit',this)">
+      <span class="med-icon"><svg viewBox="0 0 36 20" width="32" height="18">
+        <g filter="url(#pipeShadow)">
+          <rect x="1" y="2" width="30" height="10" rx="5" fill="url(#pBody-si)"/>
+          <ellipse cx="31" cy="7" rx="3.5" ry="5" fill="url(#pRim-si)"/>
+          <ellipse cx="31" cy="7" rx="2.2" ry="3.2" fill="url(#pHole-si)"/>
+          <rect x="1" y="2" width="30" height="3" rx="5" fill="white" opacity="0.22"/>
+          <line x1="5" y1="4" x2="26" y2="4" stroke="white" stroke-width="0.6" opacity="0.35"/>
+          <path d="M13 7l2 2 4-4" stroke="#bbf7d0" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+        </g>
+      </svg></span>
+      Sicherheit
+    </button>
+  </div>
+
+  <div class="chat-area" id="chat">
+    <div class="welcome" id="welcome">
+      <div class="brain-orb">
+        <span class="brain-emoji">&#x1F9E0;</span>
+      </div>
+      <h2>BAUSITE Brain</h2>
+      <div class="sub"><span id="typed-sub"></span></div>
+      <div class="stats">
+        <span><span class="sdot"></span> <span class="counter" data-target="485">0</span> Dokumente</span>
+        <span><span class="sdot"></span> <span class="counter" data-target="16844">0</span> Wissens-Chunks</span>
+        <span><span class="sdot"></span> SIA, SVGW, SUVA, BauAV</span>
+      </div>
+      <div class="suggestions">
+        <button class="suggest-btn" onclick="ask(this.innerText.trim())">Wie tief muss ein Wassergraben mindestens sein?<span class="btn-accent"></span></button>
+        <button class="suggest-btn" onclick="ask(this.innerText.trim())">Wann brauche ich eine Spriessung im Graben?<span class="btn-accent"></span></button>
+        <button class="suggest-btn" onclick="ask(this.innerText.trim())">Ab welcher Temperatur darf Asphalt eingebaut werden?<span class="btn-accent"></span></button>
+        <button class="suggest-btn" onclick="ask(this.innerText.trim())">Was sagt SIA 118 zur Garantiefrist?<span class="btn-accent"></span></button>
+        <button class="suggest-btn" onclick="ask(this.innerText.trim())">Ablauf Druckpruefung Wasserleitung<span class="btn-accent"></span></button>
+        <button class="suggest-btn" onclick="ask(this.innerText.trim())">Welche Farbe hat das Warnband fuer Gas?<span class="btn-accent"></span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="typing" id="typing">
+    <div class="bubble">
+      <div class="tdot"></div><div class="tdot"></div><div class="tdot"></div>
+      <span class="typing-text">Brain durchsucht Normen...</span>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <textarea id="input" rows="1" placeholder="Stelle eine Frage zu Schweizer Baunormen..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+    <div style="position:relative;">
+      <span class="voice-status" id="voiceStatus">Spricht...</span>
+      <button class="mic-btn" id="micBtn" onclick="toggleVoice()" title="Spracheingabe">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
+    </div>
+    <button class="send-btn" onclick="send()" id="sendBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
+    </button>
+  </div>
+
+  <div class="footer">BAUSITE digital &middot; Schweizer Netzbau-Wissen &middot; bausite.ch</div>
+</div>
+
+<script>
+const API = 'https://n8n.go-digital.site/webhook/bausite-brain';
+
+let currentRole = localStorage.getItem('brain-role') || 'polier';
+let currentCat = 'alle';
+let chatHistory = JSON.parse(localStorage.getItem('brain-history-v3') || '[]');
+let currentChatId = null;
+let currentMessages = [];
+
+const catColors = {
+  '01_wasser':'var(--blue-water)','02_strom':'var(--red-strom)','03_gas':'var(--yellow-gas)',
+  '04_bau_tiefbau':'var(--orange-bau)','05_sicherheit':'var(--green-safe)',
+  '06_reglemente_swg':'var(--navy-light)','07_schaechte':'var(--orange-bau)',
+  '08_materialien':'var(--orange-bau)','10_baustelle':'var(--orange-bau)'
+};
+
+const roleTitles = {
+  polier:'Polier-Modus', bauleiter:'Bauleiter-Modus', planer:'Planer-Modus',
+  behoerde:'Behoerden-Modus', lehrling:'Lehrlings-Modus'
+};
+
+// Init role
+document.querySelectorAll('.role-btn').forEach(b => {
+  b.classList.toggle('active', b.dataset.role === currentRole);
+});
+renderHistory();
+
+function setRole(role, btn) {
+  currentRole = role;
+  localStorage.setItem('brain-role', role);
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Collapse after selection on mobile
+  document.getElementById('roleSelector').classList.remove('expanded');
+  // Click animation
+  if (typeof gsap !== 'undefined') {
+    gsap.fromTo(btn, { scale: 0.85 }, { scale: 1, duration: 0.4, ease: 'back.out(2)' });
+  }
+}
+
+// Mobile: toggle role selector expansion on tap
+document.getElementById('roleSelector').addEventListener('click', function(e) {
+  // Only toggle if the click was on the active button (to expand) or outside a button
+  if (e.target.closest('.role-btn.active') || !e.target.closest('.role-btn')) {
+    this.classList.toggle('expanded');
+  }
+});
+
+function setCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Click animation
+  if (typeof gsap !== 'undefined') {
+    gsap.fromTo(btn, { scale: 0.88 }, { scale: 1, duration: 0.35, ease: 'back.out(2)' });
+    const icon = btn.querySelector('.med-icon');
+    if (icon) gsap.fromTo(icon, { scale: 0.3 }, { scale: 1, duration: 0.5, ease: 'elastic.out(1, 0.4)' });
+  }
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+
+function newChat() {
+  currentChatId = null;
+  currentMessages = [];
+  const chat = document.getElementById('chat');
+  chat.innerHTML = '';
+  chat.innerHTML = createWelcome();
+  renderHistory();
+  if (window.innerWidth < 768) toggleSidebar();
+  setTimeout(initWelcomeAnimations, 50);
+}
+
+function createWelcome() {
+  return `<div class="welcome" id="welcome">
+    <div class="brain-orb"><span class="brain-emoji">&#x1F9E0;</span></div>
+    <h2>BAUSITE Brain</h2>
+    <div class="sub"><span id="typed-sub"></span></div>
+    <div class="stats"><span><span class="sdot"></span> <span class="counter" data-target="485">0</span> Dokumente</span><span><span class="sdot"></span> <span class="counter" data-target="16844">0</span> Chunks</span></div>
+    <div class="suggestions">
+      <button class="suggest-btn" onclick="ask(this.innerText.trim())">Wie tief muss ein Wassergraben sein?<span class="btn-accent"></span></button>
+      <button class="suggest-btn" onclick="ask(this.innerText.trim())">Wann brauche ich eine Spriessung?<span class="btn-accent"></span></button>
+      <button class="suggest-btn" onclick="ask(this.innerText.trim())">Was sagt SIA 118 zur Garantiefrist?<span class="btn-accent"></span></button>
+    </div>
+  </div>`;
+}
+
+function ask(text) {
+  document.getElementById('input').value = text;
+  send();
+}
+
+async function send() {
+  const input = document.getElementById('input');
+  const q = input.value.trim();
+  if (!q) return;
+
+  const welcome = document.getElementById('welcome');
+  if (welcome) welcome.remove();
+
+  if (!currentChatId) { currentChatId = Date.now().toString(); currentMessages = []; }
+
+  // User msg
+  const chat = document.getElementById('chat');
+  const userDiv = document.createElement('div');
+  userDiv.className = 'msg msg-user';
+  userDiv.innerHTML = `<div class="bubble">${esc(q)}</div>`;
+  chat.appendChild(userDiv);
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+  document.getElementById('typing').style.display = 'block';
+  scrollBottom();
+
+  try {
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ question: q, role: currentRole, category: currentCat })
+    });
+
+    document.getElementById('typing').style.display = 'none';
+    const data = await res.json();
+    addBotMsg(data);
+  } catch (err) {
+    document.getElementById('typing').style.display = 'none';
+    const errDiv = document.createElement('div');
+    errDiv.className = 'msg msg-bot';
+    errDiv.innerHTML = `<div class="bubble">Verbindungsfehler. Bitte versuche es erneut.</div>`;
+    chat.appendChild(errDiv);
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+  currentMessages.push({ role: 'user', text: q });
+  saveChat(q);
+  scrollBottom();
+  input.focus();
+}
+
+function addBotMsg(data) {
+  const chat = document.getElementById('chat');
+  const div = document.createElement('div');
+  const isCQ = data.isCounterQuestion;
+  div.className = 'msg msg-bot' + (isCQ ? ' counter-q' : '');
+
+  let html = `<div class="bot-label"><span class="label-dot"></span> ${isCQ ? 'Rueckfrage' : roleTitles[currentRole] || 'Brain'}</div>`;
+  html += `<div class="bubble">${md(data.answer || 'Keine Antwort.')}`;
+
+  // Sources
+  if (data.sources && data.sources.length > 0 && !isCQ) {
+    html += '<div class="sources"><span class="sources-label">Quellen:</span>';
+    data.sources.forEach(s => {
+      const cats = data.categoryHits || [];
+      const color = catColors[cats[0]] || 'var(--navy-light)';
+      const short = s.length > 42 ? s.substring(0, 42) + '...' : s;
+      html += `<span class="source-tag"><span class="cat-dot" style="background:${color}"></span>${esc(short)}</span>`;
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // Actions
+  html += '<div class="msg-actions">';
+  html += `<button class="action-btn" onclick="copyText(this)">&#x1F4CB; Kopieren</button>`;
+  html += '</div>';
+
+  // Followups
+  if (data.followups && data.followups.length > 0) {
+    html += '<div class="followups"><span class="followups-label">Weiterfuehrende Fragen:</span>';
+    data.followups.forEach(f => {
+      html += `<button class="followup-btn" onclick="ask(this.textContent)">&#x2192; ${esc(f)}</button>`;
+    });
+    html += '</div>';
+  }
+
+  div.innerHTML = html;
+  chat.appendChild(div);
+  currentMessages.push({ role: 'bot', text: data.answer });
+}
+
+function copyText(btn) {
+  const bubble = btn.closest('.msg-bot').querySelector('.bubble');
+  navigator.clipboard.writeText(bubble.innerText);
+  btn.innerHTML = '&#x2705; Kopiert';
+  setTimeout(() => btn.innerHTML = '&#x1F4CB; Kopieren', 2000);
+}
+
+function saveChat(firstQ) {
+  if (!currentChatId) return;
+  const existing = chatHistory.find(c => c.id === currentChatId);
+  if (existing) {
+    existing.updated = Date.now();
+    existing.count = currentMessages.length;
+  } else {
+    chatHistory.unshift({
+      id: currentChatId,
+      title: firstQ.substring(0, 50),
+      created: Date.now(),
+      updated: Date.now(),
+      count: currentMessages.length
+    });
+  }
+  if (chatHistory.length > 50) chatHistory = chatHistory.slice(0, 50);
+  localStorage.setItem('brain-history-v3', JSON.stringify(chatHistory));
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  list.innerHTML = '';
+  chatHistory.forEach(c => {
+    const d = new Date(c.updated);
+    const dateStr = d.toLocaleDateString('de-CH', { day:'2-digit', month:'2-digit' });
+    const div = document.createElement('div');
+    div.className = 'history-item' + (c.id === currentChatId ? ' active' : '');
+    div.innerHTML = `${esc(c.title)}<div class="date">${dateStr} &middot; ${c.count || 0} Nachrichten</div>`;
+    div.onclick = () => { currentChatId = c.id; renderHistory(); if(window.innerWidth<768) toggleSidebar(); };
+    list.appendChild(div);
+  });
+}
+
+function scrollBottom() {
+  const c = document.getElementById('chat');
+  setTimeout(() => c.scrollTop = c.scrollHeight, 60);
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function md(t) {
+  return t
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code>$1</code>')
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
+    .replace(/^\d+\.\s+(.+)$/gm,'<li>$1</li>')
+    .replace(/^[-\*]\s+(.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
+    .replace(/\n\n/g,'<br><br>')
+    .replace(/\n/g,'<br>');
+}
+
+document.getElementById('input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+// ── ANIMATIONS ──
+
+// Typed.js — Subtitle typing effect
+function initTyped() {
+  const el = document.getElementById('typed-sub');
+  if (!el || typeof Typed === 'undefined') return;
+  new Typed('#typed-sub', {
+    strings: [
+      'Dein digitaler Normen-Assistent fuer Schweizer Netzbau',
+      'SIA · SVGW · SUVA · BauAV — alles durchsuchbar',
+      'Dein digitaler Normen-Assistent fuer Schweizer Netzbau'
+    ],
+    typeSpeed: 30,
+    backSpeed: 15,
+    backDelay: 3000,
+    startDelay: 600,
+    loop: false,
+    showCursor: true,
+    cursorChar: '|'
+  });
+}
+
+// Counter animation
+function animateCounters() {
+  document.querySelectorAll('.counter').forEach(el => {
+    const target = parseInt(el.dataset.target);
+    const duration = 2000;
+    const start = performance.now();
+    const format = target > 9999;
+
+    function update(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      let val = Math.floor(eased * target);
+      if (format) {
+        el.textContent = val.toLocaleString('de-CH').replace(/,/g, "'");
+      } else {
+        el.textContent = val;
+      }
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  });
+}
+
+// GSAP — Welcome stagger animations
+function initWelcomeAnimations() {
+  if (typeof gsap === 'undefined') return;
+
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+  tl.from('.brain-orb', { scale: 0, rotation: -180, duration: 0.8, delay: 0.2 })
+    .from('.welcome h2', { opacity: 0, y: 30, duration: 0.5 }, '-=0.3')
+    .from('.welcome .sub', { opacity: 0, y: 20, duration: 0.4 }, '-=0.2')
+    .from('.welcome .stats span', { opacity: 0, y: 15, duration: 0.3, stagger: 0.1 }, '-=0.1')
+    .from('.suggest-btn', { opacity: 0, y: 20, scale: 0.95, duration: 0.35, stagger: 0.08 }, '-=0.1');
+
+  // Start typed after orb appears
+  tl.call(initTyped, null, 0.8);
+  tl.call(animateCounters, null, 1.2);
+}
+
+// tsParticles — Subtle network background
+function initParticles() {
+  if (typeof tsParticles === 'undefined') return;
+  tsParticles.load('particles', {
+    fpsLimit: 30,
+    particles: {
+      number: { value: 35, density: { enable: true, area: 1200 } },
+      color: { value: ['#E67E22', '#F39C12', '#3498DB', '#8899bb'] },
+      shape: { type: 'circle' },
+      opacity: { value: { min: 0.08, max: 0.2 }, animation: { enable: true, speed: 0.3, minimumValue: 0.05 } },
+      size: { value: { min: 1, max: 3 } },
+      links: {
+        enable: true,
+        distance: 160,
+        color: '#E67E22',
+        opacity: 0.06,
+        width: 1
+      },
+      move: {
+        enable: true,
+        speed: 0.4,
+        direction: 'none',
+        outModes: 'bounce'
+      }
+    },
+    interactivity: {
+      events: {
+        onHover: { enable: true, mode: 'grab' },
+        resize: true
+      },
+      modes: {
+        grab: { distance: 140, links: { opacity: 0.15 } }
+      }
+    },
+    detectRetina: true
+  });
+}
+
+// Send button pulse animation
+const origSend = send;
+send = async function() {
+  const btn = document.getElementById('sendBtn');
+  btn.classList.add('pulse');
+  setTimeout(() => btn.classList.remove('pulse'), 400);
+  return origSend();
+};
+
+// Message entrance animations with GSAP (sub-elements only, CSS handles main msg)
+const origAddBotMsg = addBotMsg;
+addBotMsg = function(data) {
+  origAddBotMsg(data);
+  if (typeof gsap === 'undefined') return;
+  const msgs = document.querySelectorAll('.msg-bot');
+  const last = msgs[msgs.length - 1];
+  if (!last) return;
+  // Only animate sub-elements, let CSS msgIn handle the main container
+  const sources = last.querySelectorAll('.source-tag');
+  const followups = last.querySelectorAll('.followup-btn');
+  if (sources.length) {
+    gsap.fromTo(sources, { opacity: 0, y: 10 }, { opacity: 1, y: 0, stagger: 0.06, duration: 0.3, delay: 0.4, ease: 'power2.out' });
+  }
+  if (followups.length) {
+    gsap.fromTo(followups, { opacity: 0, x: -15 }, { opacity: 1, x: 0, stagger: 0.08, duration: 0.3, delay: 0.6, ease: 'power2.out' });
+  }
+};
+
+// Topbar & filter animations on load
+function initTopbarAnimations() {
+  if (typeof gsap === 'undefined') return;
+  // Only animate the active role button on load (others are hidden)
+  gsap.fromTo('.role-btn.active',
+    { opacity: 0, scale: 0.8 },
+    { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(2)', delay: 0.1 }
+  );
+  gsap.fromTo('.filter-chip',
+    { opacity: 0, y: 8 },
+    { opacity: 1, y: 0, stagger: 0.06, duration: 0.35, ease: 'power2.out', delay: 0.2 }
+  );
+}
+
+// Init everything on load
+window.addEventListener('DOMContentLoaded', () => {
+  initParticles();
+  setTimeout(initWelcomeAnimations, 100);
+  setTimeout(initTopbarAnimations, 50);
+});
+
+// ── VOICE INPUT (Web Speech API) ──
+let recognition = null;
+let isRecording = false;
+
+function initVoice() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    document.getElementById('micBtn').style.display = 'none';
+    return;
+  }
+  recognition = new SpeechRecognition();
+  recognition.lang = 'de-DE';
+  recognition.interimResults = true;
+  recognition.continuous = true;
+
+  recognition.onresult = (event) => {
+    let interim = '';
+    let final = '';
+    for (let i = 0; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        final += event.results[i][0].transcript;
+      } else {
+        interim += event.results[i][0].transcript;
+      }
+    }
+    const input = document.getElementById('input');
+    input.value = final + interim;
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  };
+
+  recognition.onend = () => {
+    if (isRecording) {
+      // Auto-send after speech ends
+      const input = document.getElementById('input');
+      if (input.value.trim()) {
+        setTimeout(() => {
+          stopVoice();
+          send();
+        }, 500);
+      } else {
+        stopVoice();
+      }
+    }
+  };
+
+  recognition.onerror = (e) => {
+    console.log('Speech error:', e.error);
+    stopVoice();
+  };
+}
+
+function toggleVoice() {
+  if (isRecording) {
+    stopVoice();
+  } else {
+    startVoice();
+  }
+}
+
+function startVoice() {
+  if (!recognition) return;
+  isRecording = true;
+  document.getElementById('micBtn').classList.add('recording');
+  document.getElementById('voiceStatus').style.display = 'block';
+  document.getElementById('input').value = '';
+  recognition.start();
+}
+
+function stopVoice() {
+  isRecording = false;
+  document.getElementById('micBtn').classList.remove('recording');
+  document.getElementById('voiceStatus').style.display = 'none';
+  if (recognition) {
+    try { recognition.stop(); } catch(e) {}
+  }
+}
+
+// Init voice on load
+window.addEventListener('DOMContentLoaded', () => {
+  initVoice();
+});
+</script>
+</body>
+</html>
