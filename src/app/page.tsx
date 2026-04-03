@@ -131,11 +131,13 @@ export default function Home() {
               Produkte entdecken <ChevronRight size={18} />
             </a>
             <a
-              href="/brain"
+              href="https://brain.bausite.ch"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-6 py-3 rounded-lg border-2 font-medium flex items-center gap-2 hover:bg-gray-50 transition"
               style={{ borderColor: PURPLE, color: PURPLE }}
             >
-              <Brain size={18} /> Brain Demo
+              <Brain size={18} /> Brain testen
             </a>
           </motion.div>
         </div>
