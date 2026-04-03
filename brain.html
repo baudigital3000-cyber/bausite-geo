@@ -823,10 +823,19 @@ body {
   .menu-btn { display: block; }
   .msg { max-width: 92%; }
   .role-btn { padding: 8px 12px; font-size: 12px; }
-  .role-selector { gap: 4px; }
+  .role-selector { gap: 4px; flex-wrap: wrap; }
   .role-btn .role-icon { width: 16px; height: 16px; }
   .welcome h2 { font-size: 20px; }
   .welcome .stats { flex-wrap: wrap; justify-content: center; }
+  /* Mobile: Show all role buttons always (no hover) */
+  .role-selector .role-btn:not(.active) {
+    max-width: 200px !important;
+    padding: 8px 12px !important;
+    border-color: var(--border) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  .role-selector .role-btn.active::after { display: none; }
 }
 </style>
 </head>
@@ -1196,10 +1205,22 @@ async function send() {
   scrollBottom();
 
   try {
+    // Build conversation history for memory (last 6 messages)
+    const history = currentMessages.slice(-6).map(m => ({
+      role: m.role === 'user' ? 'user' : 'assistant',
+      content: m.text
+    }));
+
     const res = await fetch(API, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ question: q, role: currentRole, category: currentCat })
+      body: JSON.stringify({
+        question: q,
+        role: currentRole,
+        category: currentCat,
+        history: history,
+        sessionId: currentChatId
+      })
     });
 
     document.getElementById('typing').style.display = 'none';
