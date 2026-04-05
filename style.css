@@ -155,6 +155,63 @@ body {
   background: var(--navy-deep);
   border-bottom: 1px solid rgba(255,255,255,0.08);
   z-index: 100;
+  position: relative;
+}
+
+/* ── Brain Button ── */
+.header-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 101;
+}
+
+.brain-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px 7px 12px;
+  background: linear-gradient(135deg, #632E62 0%, #7B3A7A 60%, #8B3A8A 100%);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 20px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 0 14px rgba(99,46,98,0.7), 0 2px 8px rgba(0,0,0,0.3);
+  transition: box-shadow 0.2s ease, transform 0.15s ease, background 0.2s ease;
+  white-space: nowrap;
+}
+
+.brain-btn:hover {
+  background: linear-gradient(135deg, #7B3A7A 0%, #8B3A8A 60%, #9B4A9A 100%);
+  box-shadow: 0 0 24px rgba(99,46,98,0.9), 0 4px 14px rgba(0,0,0,0.35);
+  transform: translateY(-1px);
+}
+
+.brain-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 0 10px rgba(99,46,98,0.6);
+}
+
+.brain-icon {
+  opacity: 0.95;
+  flex-shrink: 0;
+}
+
+.brain-badge {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.1em;
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.25);
+  line-height: 1.4;
 }
 
 .header-left {
@@ -953,4 +1010,7 @@ input:checked + .toggle-slider::after {
   .sidebar { width: 260px; }
   .detail-panel.open { width: 300px; }
   .header-right { display: none; }
+  .brain-btn span:first-of-type { display: none; }
+  .brain-badge { display: none; }
+  .brain-btn { padding: 7px 10px; gap: 0; }
 }
