@@ -10,6 +10,7 @@ import {
   Zap,
   Shield,
   BarChart3,
+  ExternalLink,
 } from "lucide-react";
 
 const PURPLE = "#632E62";
@@ -21,13 +22,15 @@ const products = [
     desc: "GIS-Plattform mit swisstopo, Leitungskataster und OEREB-Integration",
     color: "#2E86C1",
     status: "Prototyp",
+    href: "https://geo.bausite.ch",
   },
   {
     icon: Brain,
     title: "Bausite Brain",
     desc: "KI-Agenten fuer Kosten, Bewilligungen, Leitungen und Projektplanung",
     color: "#8E44AD",
-    status: "Konzept",
+    status: "Live",
+    href: "https://brain.bausite.ch",
   },
   {
     icon: Phone,
@@ -80,17 +83,30 @@ export default function Home() {
               Bausite
             </span>
           </div>
-          <nav className="hidden md:flex gap-6 text-sm text-gray-600">
-            <a href="#produkte" className="hover:text-gray-900">
-              Produkte
+          <div className="flex items-center gap-6">
+            <nav className="hidden md:flex gap-6 text-sm text-gray-600">
+              <a href="#produkte" className="hover:text-gray-900">
+                Produkte
+              </a>
+              <a href="#features" className="hover:text-gray-900">
+                Features
+              </a>
+              <a href="#kontakt" className="hover:text-gray-900">
+                Kontakt
+              </a>
+            </nav>
+            <a
+              href="https://brain.bausite.ch"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold transition-all hover:opacity-90 hover:shadow-lg"
+              style={{ background: PURPLE }}
+            >
+              <Brain size={16} />
+              Brain starten
+              <ExternalLink size={14} className="opacity-70" />
             </a>
-            <a href="#features" className="hover:text-gray-900">
-              Features
-            </a>
-            <a href="#kontakt" className="hover:text-gray-900">
-              Kontakt
-            </a>
-          </nav>
+          </div>
         </div>
       </header>
 
@@ -153,40 +169,60 @@ export default function Home() {
             Unsere Produkte
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {products.map((p, i) => (
-              <motion.div
-                key={p.title}
-                className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <div className="flex items-start gap-4">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center text-white flex-shrink-0"
-                    style={{ background: p.color }}
+            {products.map((p, i) => {
+              const CardWrapper = p.href ? "a" : "div";
+              const linkProps = p.href
+                ? { href: p.href, target: "_blank", rel: "noopener noreferrer" }
+                : {};
+              return (
+                <motion.div
+                  key={p.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <CardWrapper
+                    {...linkProps}
+                    className={`block border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all ${
+                      p.href
+                        ? "cursor-pointer hover:border-gray-300 hover:-translate-y-0.5"
+                        : ""
+                    }`}
                   >
-                    <p.icon size={24} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-bold">{p.title}</h3>
-                      <span
-                        className="text-xs px-2 py-0.5 rounded-full font-medium"
-                        style={{
-                          background: p.color + "15",
-                          color: p.color,
-                        }}
+                    <div className="flex items-start gap-4">
+                      <div
+                        className="w-12 h-12 rounded-lg flex items-center justify-center text-white flex-shrink-0"
+                        style={{ background: p.color }}
                       >
-                        {p.status}
-                      </span>
+                        <p.icon size={24} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="text-lg font-bold">{p.title}</h3>
+                          <span
+                            className="text-xs px-2 py-0.5 rounded-full font-medium"
+                            style={{
+                              background: p.color + "15",
+                              color: p.color,
+                            }}
+                          >
+                            {p.status}
+                          </span>
+                          {p.href && (
+                            <ExternalLink
+                              size={14}
+                              className="text-gray-400 ml-auto"
+                            />
+                          )}
+                        </div>
+                        <p className="text-gray-600 text-sm">{p.desc}</p>
+                      </div>
                     </div>
-                    <p className="text-gray-600 text-sm">{p.desc}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                  </CardWrapper>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
